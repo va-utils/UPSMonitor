@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.489
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UPSMonitor", "UPSMonitor\UPSMonitor.csproj", "{FF550B77-D6B9-44AF-A53C-6EF1DC50313E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UPSCls", "UPSCls\UPSCls.csproj", "{BE37D473-99D0-4D12-955D-EEF13765D67E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UPSLogViewer", "UPSLogViewer\UPSLogViewer.csproj", "{4BB989BC-3F73-4596-80B2-4FBF3C280786}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FF550B77-D6B9-44AF-A53C-6EF1DC50313E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF550B77-D6B9-44AF-A53C-6EF1DC50313E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF550B77-D6B9-44AF-A53C-6EF1DC50313E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF550B77-D6B9-44AF-A53C-6EF1DC50313E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE37D473-99D0-4D12-955D-EEF13765D67E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE37D473-99D0-4D12-955D-EEF13765D67E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE37D473-99D0-4D12-955D-EEF13765D67E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE37D473-99D0-4D12-955D-EEF13765D67E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BB989BC-3F73-4596-80B2-4FBF3C280786}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BB989BC-3F73-4596-80B2-4FBF3C280786}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BB989BC-3F73-4596-80B2-4FBF3C280786}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BB989BC-3F73-4596-80B2-4FBF3C280786}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0DC6A064-BD75-4D2D-8A00-C12250BBE470}
+	EndGlobalSection
+EndGlobal
