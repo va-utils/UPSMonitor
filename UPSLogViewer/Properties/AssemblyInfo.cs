@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("UPSLogViewer")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Viktor Vyalichkin")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("UPSLogViewer")]
 [assembly: AssemblyCopyright("Copyright © Viktor Vyalichkin 2019")]
 [assembly: AssemblyTrademark("")]

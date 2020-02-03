@@ -79,7 +79,7 @@ UPSLogViewer показывает эту информацию в табличн�
         {
             FileVersionInfo cls = FileVersionInfo.GetVersionInfo(@"UPSCls.dll");
             FileVersionInfo mnt = FileVersionInfo.GetVersionInfo(@"UPSMonitor.exe");
-            string about = string.Format("Версии сборок:\nUPSLogViewer: {1}\nUPSCls: {2}\nUPSMonitor: {3}\nАвтор: Вяличкин В.А.E - mail: viktor70 @protonmail.com", Application.ProductVersion, cls.ProductVersion,mnt.ProductVersion);
+            string about = string.Format("Версии сборок:\nUPSLogViewer: {0}\nUPSCls: {1}\nUPSMonitor: {2}\nАвтор: Вяличкин В.А.E - mail: viktor70 @protonmail.com", Application.ProductVersion, cls.ProductVersion,mnt.ProductVersion);
             MessageBox.Show(about);
         }
 

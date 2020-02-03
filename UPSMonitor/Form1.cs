@@ -9,6 +9,7 @@ namespace UPSMonitor
 {
     public partial class MainForm : Form
     {
+        string portName;
         UPS ups;
         FileStream logStream;
         public MainForm()
@@ -31,11 +32,10 @@ namespace UPSMonitor
         {
             if (e.IsOK)
             {
-                if (logStream == null)
+                if (logStream != null)
                 {
-                    MessageBox.Show("logStream=null");
+                     ups.status.SaveStatus(logStream); 
                 }
-                ups.status.SaveStatus(logStream);
                 lblErr.Visible = false;
                 lbInVoltage.Text = string.Format(CultureInfo.GetCultureInfo("en-US"), "{0}V", ups.status.InputVoltage);
                 lbCurrent.Text = string.Format(CultureInfo.GetCultureInfo("en-US"), "Нагрузка: {0}%", ups.status.Loading);
@@ -110,24 +110,32 @@ namespace UPSMonitor
             this.about.Text = about;
             //--------------------------
 
+            this.Location = Properties.Settings.Default.Position;
             //для настроек
+            nudInterval.Value = Properties.Settings.Default.Interval;
+            timer1.Interval = Properties.Settings.Default.Interval;
+            cbLog.Checked = Properties.Settings.Default.LogOnStart;
             string[] ports = System.IO.Ports.SerialPort.GetPortNames();
             if(ports.Length == 0)
             {
                 MessageBox.Show("COM-порты не найдены, продолжение невозможно.");
-                return;
+               // return;
             }
-
-            cbPortName.Items.AddRange(ports);
-            cbPortName.SelectedItem = Properties.Settings.Default.PortName;
-            nudInterval.Value = Properties.Settings.Default.Interval;
-            timer1.Interval = Properties.Settings.Default.Interval;
-            cbLog.Checked = Properties.Settings.Default.LogOnStart;
-
+            else
+            {
+                cbPortName.Items.AddRange(ports);
+                
+                portName = Properties.Settings.Default.PortName;
+                if(!String.IsNullOrWhiteSpace(portName))
+                {
+                    portName = ports[0];
+                    cbPortName.SelectedItem = portName;
+                }
+            }
             //----------------------------
 
             //TODO: учесть ситуацию, что пользователь изменил размер экрана
-            this.Location = Properties.Settings.Default.Position;
+
 
             Start();
         }
@@ -159,15 +167,22 @@ namespace UPSMonitor
 
         private void Start()
         {
-            ups.StartExchange(Properties.Settings.Default.PortName);
-            if (ups.IsPortOpen)
+            if(!String.IsNullOrWhiteSpace(portName))
             {
-                if (Properties.Settings.Default.LogOnStart) //пользователь хочет писать лог при запуске программы
+                ups.StartExchange(Properties.Settings.Default.PortName);
+                if (ups.IsPortOpen)
                 {
-                    logStream = new FileStream("log-" + DateTime.Now.ToString("yyyyMMdd-HHmm") + ".upslog", FileMode.Create, FileAccess.Write, FileShare.Read, 8);
+                    if (Properties.Settings.Default.LogOnStart) //пользователь хочет писать лог при запуске программы
+                    {
+                        logStream = new FileStream("log-" + DateTime.Now.ToString("yyyyMMdd-HHmm") + ".upslog", FileMode.Create, FileAccess.Write, FileShare.Read, 8);
+                    }
+                    timer1.Enabled = true;
+                    timer1.Start();
                 }
-                timer1.Enabled = true;
-                timer1.Start();
+            }
+            else
+            {
+                lblErr.Visible = true;
             }
         }
     }

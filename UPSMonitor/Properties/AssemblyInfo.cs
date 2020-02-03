@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("UPSMonitor")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Viktor Vyalichkin")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("UPSMonitor")]
 [assembly: AssemblyCopyright("Copyright © Viktor Vyalichkin 2019")]
 [assembly: AssemblyTrademark("")]
