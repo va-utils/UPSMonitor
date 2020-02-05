@@ -41,7 +41,7 @@ namespace UPSMonitor
             cbPortName.Items.AddRange(ports);
             if (String.IsNullOrWhiteSpace(Properties.Settings.Default.PortName)) //если COM-порт не сохранен в настройках
             {
-                if (ports.Length > 0) //если они есть добавим их в список и выберем первый, разрешим работу
+                if (ports.Length > 0) //если они есть выберем первый, разрешим работу
                 {
                     cbPortName.SelectedItem = ports[0];
                     Properties.Settings.Default.PortName = ports[0];
