@@ -9,13 +9,62 @@ namespace UPSMonitor
 {
     public partial class MainForm : Form
     {
-        string portName;
+        bool ready;
         UPS ups;
         FileStream logStream;
+        //------------настройки мать их ети
+   ////     string comPort;
+    //    int interval;
+    //    bool log;
+        //---------------------------------
+
+        public void SaveSettings()
+        {
+            Properties.Settings.Default.Position = this.Location;
+            Properties.Settings.Default.PortName = (string)cbPortName.SelectedItem;
+            Properties.Settings.Default.LogOnStart = cbLog.Checked;
+            Properties.Settings.Default.Interval = (int)nudInterval.Value;
+            if (!string.IsNullOrWhiteSpace(Properties.Settings.Default.PortName))
+                Properties.Settings.Default.Save();
+            else
+                MessageBox.Show("Не выбран COM-порт, продолжение невозможно.");
+        }
+
+        public void LoadSettings()
+        {
+            Properties.Settings.Default.Reload();
+            Location = Properties.Settings.Default.Position;
+
+            nudInterval.Value = Properties.Settings.Default.Interval;
+            cbLog.Checked = Properties.Settings.Default.LogOnStart;
+            string[] ports = System.IO.Ports.SerialPort.GetPortNames(); // получим список всех портов в системе
+            cbPortName.Items.AddRange(ports);
+            if (String.IsNullOrWhiteSpace(Properties.Settings.Default.PortName)) //если COM-порт не сохранен в настройках
+            {
+                if (ports.Length > 0) //если они есть добавим их в список и выберем первый, разрешим работу
+                {
+                    cbPortName.SelectedItem = ports[0];
+                    Properties.Settings.Default.PortName = ports[0];
+                    ready = true;
+                }
+                else // если нет ругаемся и запрещает обмен
+                {
+                    MessageBox.Show("COM-порты недоступны. Продолжение невозможно.");
+                    ready = false;
+                }
+            }
+            else // COM-порт сохранен в настройках, выбираем его, разрешаем обмен
+            {
+                cbPortName.SelectedItem = Properties.Settings.Default.PortName;
+                ready = true;
+            }
+        }
+
         public MainForm()
         {
             InitializeComponent();
             ups = UPS.Instance;
+            logStream = null;
             ups.UPSConnectStatusUpdated += this.UPSStatusUpdated;
             Application.ApplicationExit += new EventHandler(OnApplicationExit);
         }
@@ -110,32 +159,7 @@ namespace UPSMonitor
             this.about.Text = about;
             //--------------------------
 
-            this.Location = Properties.Settings.Default.Position;
-            //для настроек
-            nudInterval.Value = Properties.Settings.Default.Interval;
-            timer1.Interval = Properties.Settings.Default.Interval;
-            cbLog.Checked = Properties.Settings.Default.LogOnStart;
-            string[] ports = System.IO.Ports.SerialPort.GetPortNames();
-            if(ports.Length == 0)
-            {
-                MessageBox.Show("COM-порты не найдены, продолжение невозможно.");
-               // return;
-            }
-            else
-            {
-                cbPortName.Items.AddRange(ports);
-                
-                portName = Properties.Settings.Default.PortName;
-                if(!String.IsNullOrWhiteSpace(portName))
-                {
-                    portName = ports[0];
-                    cbPortName.SelectedItem = portName;
-                }
-            }
-            //----------------------------
-
-            //TODO: учесть ситуацию, что пользователь изменил размер экрана
-
+            LoadSettings();
 
             Start();
         }
@@ -143,15 +167,8 @@ namespace UPSMonitor
         private void saveButton_Click(object sender, EventArgs e)
         {
 
-            Properties.Settings.Default.LogOnStart = cbLog.Checked;
-            Properties.Settings.Default.Interval = Convert.ToInt32(nudInterval.Value);
-
-            if (!String.IsNullOrWhiteSpace((string)cbPortName.SelectedItem))
-                Properties.Settings.Default.PortName = (string)cbPortName.SelectedItem;
-
-            Properties.Settings.Default.Save();
-
-            //--------------------------------
+            SaveSettings();
+            LoadSettings();
 
             Stop();
             Start();
@@ -159,15 +176,21 @@ namespace UPSMonitor
 
         private void Stop()
         {
-            timer1.Stop();
-            ups.StopExchange();
-            if (logStream != null)
-                logStream.Close();
+            if(ups.IsPortOpen)
+            {
+                timer1.Stop();
+                ups.StopExchange();
+                if (logStream != null)
+                {
+                    logStream.Close();
+                    logStream = null;
+                }
+            }
         }
 
         private void Start()
         {
-            if(!String.IsNullOrWhiteSpace(portName))
+            if(ready==true)
             {
                 ups.StartExchange(Properties.Settings.Default.PortName);
                 if (ups.IsPortOpen)
@@ -176,6 +199,7 @@ namespace UPSMonitor
                     {
                         logStream = new FileStream("log-" + DateTime.Now.ToString("yyyyMMdd-HHmm") + ".upslog", FileMode.Create, FileAccess.Write, FileShare.Read, 8);
                     }
+                    timer1.Interval = Properties.Settings.Default.Interval;
                     timer1.Enabled = true;
                     timer1.Start();
                 }

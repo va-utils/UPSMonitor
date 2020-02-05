@@ -5,7 +5,6 @@ using System.Windows.Forms;
 using System.IO;
 using UPSCls;
 using System.Diagnostics;
-using System.Globalization;
 
 namespace UPSLogViewer
 {
@@ -13,7 +12,6 @@ namespace UPSLogViewer
     {
         List<UPSStatus> log;
         string fileName;
-        string lang;
         public MainForm()
         {
             InitializeComponent();
@@ -24,8 +22,9 @@ namespace UPSLogViewer
         {
             lvLog.VirtualListSize = 0;
 
-            using (FileStream fs = new FileStream(fname, FileMode.Open, FileAccess.Read,FileShare.ReadWrite)) 
+            using (FileStream fs = new FileStream(fname, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) 
             {
+                
                 log = new List<UPSStatus>(3600);
 
                 while (fs.Position < fs.Length)
@@ -71,7 +70,7 @@ namespace UPSLogViewer
         {
             string help = @"Программа UPSLogViewer предназначена для просмотра отчетов, сформированных UPSMonitor.
 Файл отчета представляет собой бинарный файл, в котором записаны дата и время, входное и выходное напряжение и напряжение батареи, частота, температура и нагрузка.
-UPSLogViewer показывает эту информацию в табличном виде.Разбор больших файлов может занять время.";
+UPSLogViewer показывает эту информацию в табличном виде. Разбор больших файлов может занять время.";
             MessageBox.Show(help);
         }
 
@@ -79,7 +78,7 @@ UPSLogViewer показывает эту информацию в табличн�
         {
             FileVersionInfo cls = FileVersionInfo.GetVersionInfo(@"UPSCls.dll");
             FileVersionInfo mnt = FileVersionInfo.GetVersionInfo(@"UPSMonitor.exe");
-            string about = string.Format("Версии сборок:\nUPSLogViewer: {0}\nUPSCls: {1}\nUPSMonitor: {2}\nАвтор: Вяличкин В.А.E - mail: viktor70 @protonmail.com", Application.ProductVersion, cls.ProductVersion,mnt.ProductVersion);
+            string about = string.Format("Версии сборок:\nUPSLogViewer: {0}\nUPSCls: {1}\nUPSMonitor: {2}\nАвтор: Vyalichkin V.A. E - mail: viktor70 @protonmail.com", Application.ProductVersion, cls.ProductVersion,mnt.ProductVersion);
             MessageBox.Show(about);
         }
 
