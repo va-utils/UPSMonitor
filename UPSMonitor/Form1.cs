@@ -197,7 +197,14 @@ namespace UPSMonitor
                 {
                     if (Properties.Settings.Default.LogOnStart) //пользователь хочет писать лог при запуске программы
                     {
-                        logStream = new FileStream("log-" + DateTime.Now.ToString("yyyyMMdd-HHmm") + ".upslog", FileMode.Create, FileAccess.Write, FileShare.Read, 8);
+                        string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "UPSMonitor");
+                        if(Directory.Exists(dir))
+                            logStream = new FileStream(Path.Combine(dir, "log-" + DateTime.Now.ToString("yyyyMMdd-HHmm") + ".upslog"), FileMode.Create, FileAccess.Write, FileShare.Read, 8);
+                        else
+                        {
+                            Directory.CreateDirectory(dir);
+                            logStream = new FileStream(Path.Combine(dir,"log-" + DateTime.Now.ToString("yyyyMMdd-HHmm") + ".upslog"), FileMode.Create, FileAccess.Write, FileShare.Read, 8);
+                        }
                     }
                     timer1.Interval = Properties.Settings.Default.Interval;
                     timer1.Enabled = true;
