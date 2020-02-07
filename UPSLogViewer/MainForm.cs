@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows.Forms;
 using System.IO;
 using UPSCls;
@@ -78,7 +77,7 @@ UPSLogViewer показывает эту информацию в табличн�
         {
             FileVersionInfo cls = FileVersionInfo.GetVersionInfo(@"UPSCls.dll");
             FileVersionInfo mnt = FileVersionInfo.GetVersionInfo(@"UPSMonitor.exe");
-            string about = string.Format("Версии сборок:\nUPSLogViewer: {0}\nUPSCls: {1}\nUPSMonitor: {2}\nАвтор: Vyalichkin V.A. E - mail: viktor70 @protonmail.com", Application.ProductVersion, cls.ProductVersion,mnt.ProductVersion);
+            string about = string.Format("Версии сборок:\nUPSLogViewer: {0}\nUPSCls: {1}\nUPSMonitor: {2}\nАвтор: Vyalichkin V.A. E - mail: viktor70 @protonmail.com\n\nИконка: icon lauk", Application.ProductVersion, cls.ProductVersion,mnt.ProductVersion);
             MessageBox.Show(about);
         }
 
@@ -91,6 +90,15 @@ UPSLogViewer показывает эту информацию в табличн�
             e.Item.SubItems.Add(Convert.ToString(log[e.ItemIndex].Frequency));
             e.Item.SubItems.Add(Convert.ToString(log[e.ItemIndex].Temperature));
             e.Item.SubItems.Add(Convert.ToString(log[e.ItemIndex].Loading));
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            string[] args = Environment.GetCommandLineArgs();
+            if(args.Length > 1)
+            {
+                GenerateTable(args[1]);
+            }
         }
     }
 }
