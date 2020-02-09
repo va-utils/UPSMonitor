@@ -38,6 +38,7 @@ namespace UPSMonitor
             nudInterval.Value = Properties.Settings.Default.Interval;
             cbLog.Checked = Properties.Settings.Default.LogOnStart;
             string[] ports = System.IO.Ports.SerialPort.GetPortNames(); // получим список всех портов в системе
+            cbPortName.Items.Clear();
             cbPortName.Items.AddRange(ports);
             if (String.IsNullOrWhiteSpace(Properties.Settings.Default.PortName)) //если COM-порт не сохранен в настройках
             {
