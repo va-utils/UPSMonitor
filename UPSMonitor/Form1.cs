@@ -20,7 +20,9 @@ namespace UPSMonitor
 
         public void SaveSettings()
         {
-            Properties.Settings.Default.Position = this.Location;
+
+            if (WindowState != FormWindowState.Minimized)
+                Properties.Settings.Default.Position = this.Location;
             Properties.Settings.Default.PortName = (string)cbPortName.SelectedItem;
             Properties.Settings.Default.LogOnStart = cbLog.Checked;
             Properties.Settings.Default.Interval = (int)nudInterval.Value;
@@ -118,8 +120,8 @@ namespace UPSMonitor
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            
-            Properties.Settings.Default.Position = this.Location;
+            if(WindowState != FormWindowState.Minimized)
+                Properties.Settings.Default.Position = this.Location;
             Properties.Settings.Default.Save();
             if (e.CloseReason == CloseReason.UserClosing)
             {
