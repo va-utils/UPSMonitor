@@ -76,9 +76,17 @@ namespace UPSCls
 
         private UPS()
         {
-          //  Trace.Listeners.Clear();
-          //  Trace.Listeners.Add(new TextWriterTraceListener("upscls.log"));
-          //  Trace.AutoFlush = true;
+            Trace.Listeners.Clear();
+            Trace.Listeners.Add(new TextWriterTraceListener("upscls.log"));
+            Trace.AutoFlush = true;
+            string aboutSystem = "";
+            aboutSystem += "OS:" + Environment.OSVersion + "\n";
+            aboutSystem += "COM-ports:\n";
+            foreach(string s in SerialPort.GetPortNames())
+            {
+                aboutSystem += s + "\n";
+            }
+            Trace.WriteLine(aboutSystem);
         }
 
         private static UPS instance = new UPS();
@@ -119,14 +127,17 @@ namespace UPSCls
             try
             {
                 byte[] forWrite = Encoding.ASCII.GetBytes("Q1\r");
+                Trace.WriteLine(CreateLogString(" >> " + "Q1"));
                 serialPort.Write(forWrite, 0, forWrite.Length);
                 int bytes = serialPort.BytesToRead;
+                //serialPort.
                 Trace.WriteLine(CreateLogString("Bytes to Read: " + bytes));
                 if (bytes > 0)
                 {
                     byte[] ans = new byte[bytes];
                     serialPort.Read(ans, 0, bytes);
                     String result = Encoding.ASCII.GetString(ans);
+                    Trace.WriteLine(CreateLogString(" << " + result));
                     Parse(result);
                     status.LastUpdateDateTime = DateTime.Now;
                     OnUPSConnectStatusUpdated(true);
@@ -161,7 +172,9 @@ namespace UPSCls
         {
             try
             {
+                Trace.WriteLine(CreateLogString("Port:" + portName));
                 serialPort = new SerialPort(portName, 2400, Parity.None, 8, StopBits.One);
+                Trace.WriteLine(CreateLogString("Open port..."));
                 serialPort.Open();
               //  OnUPSConnectStatusUpdated(true);
             }
@@ -172,6 +185,12 @@ namespace UPSCls
                 OnUPSConnectStatusUpdated(false);
             }
             catch (IOException e)
+            {
+                Trace.WriteLine(CreateLogString(e.Message));
+                Console.WriteLine("RS Error: " + e.Message);
+                OnUPSConnectStatusUpdated(false);
+            }
+            catch(Exception e)
             {
                 Trace.WriteLine(CreateLogString(e.Message));
                 Console.WriteLine("RS Error: " + e.Message);
