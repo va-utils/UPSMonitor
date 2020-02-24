@@ -219,5 +219,18 @@ namespace UPSMonitor
                 lblErr.Visible = true;
             }
         }
+
+        private void updateLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            try
+            {
+                Process.Start("https://github.com/va-utils/UPSMonitor/releases");
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Не удалось запустить браузер для посещения страницы загрузок: " + ex.Message);
+            }
+            
+        }
     }
 }

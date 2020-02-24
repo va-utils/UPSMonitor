@@ -55,6 +55,7 @@
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.updateLabel = new System.Windows.Forms.LinkLabel();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -309,6 +310,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.updateLabel);
             this.tabPage2.Controls.Add(this.about);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
@@ -354,6 +356,18 @@
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(108, 22);
             this.exitToolStripMenuItem.Text = "Выход";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            // 
+            // updateLabel
+            // 
+            this.updateLabel.AutoSize = true;
+            this.updateLabel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.updateLabel.Location = new System.Drawing.Point(3, 135);
+            this.updateLabel.Name = "updateLabel";
+            this.updateLabel.Size = new System.Drawing.Size(179, 13);
+            this.updateLabel.TabIndex = 1;
+            this.updateLabel.TabStop = true;
+            this.updateLabel.Text = "Проверить наличие новых версий";
+            this.updateLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.updateLabel_LinkClicked);
             // 
             // MainForm
             // 
@@ -408,6 +422,7 @@
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.Label about;
         private System.Windows.Forms.CheckBox cbLog;
+        private System.Windows.Forms.LinkLabel updateLabel;
     }
 }
 

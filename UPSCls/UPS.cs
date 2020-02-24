@@ -176,6 +176,7 @@ namespace UPSCls
                 serialPort = new SerialPort(portName, 2400, Parity.None, 8, StopBits.One);
                 Trace.WriteLine(CreateLogString("Open port..."));
                 serialPort.Open();
+                
               //  OnUPSConnectStatusUpdated(true);
             }
             catch (UnauthorizedAccessException e)
