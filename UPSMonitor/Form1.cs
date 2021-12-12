@@ -166,7 +166,8 @@ namespace UPSMonitor
             //для вкладке "О программе"
             FileVersionInfo cls = FileVersionInfo.GetVersionInfo(@"UPSCls.dll");
             FileVersionInfo vwr = FileVersionInfo.GetVersionInfo(@"UPSLogViewer.exe");
-            string about = string.Format("Версии сборок:" + "\nUPSMonitor: {0}\nUPSCls: {1}\nUPSLogViewer: {2}\n\n© Vyalichkin V.A. \nviktor70@protonmail.com\n\nИконка: icon lauk", Application.ProductVersion, cls.ProductVersion, vwr.ProductVersion);
+            FileVersionInfo hid = FileVersionInfo.GetVersionInfo(@"HidLibrary.dll");
+            string about = string.Format("Версии сборок:" + "\nUPSMonitor: {0}\nUPSCls: {1}\nUPSLogViewer: {2}\nHidLibrary (Mike O'Brien): {3}\n\n© Vyalichkin V.A. \nviktor70@protonmail.com\n\nИконка: icon lauk", Application.ProductVersion, cls.ProductVersion, vwr.ProductVersion, hid.ProductVersion);
             this.about.Text = about;
             //--------------------------
 
