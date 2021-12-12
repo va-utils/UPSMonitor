@@ -66,6 +66,7 @@ namespace UPSCls
         StringBuilder sb = new StringBuilder();
         bool usb_flag = false; //флаг разрешающий работу
         bool usb_read_mode = false;
+        short crappy_count = 0;
         //--------------------
 
         public bool IsPortOpen
@@ -182,14 +183,21 @@ namespace UPSCls
 
         public void UpdateStatus_USB()
         {
+            //---костыли---
             if(usb_flag==false) //если останавливаем работу, новых запросов не делаем.
             {
                 return;
             }
             if(usb_read_mode==true) //читаем старое, не готовы к новым посылкам
             {
-                return;
+                if (crappy_count < 5)
+                {
+                    Trace.WriteLine(CreateLogString(" Crappy Count :(( =  " + crappy_count));
+                    crappy_count++;
+                    return;
+                }
             }
+            //------
             try
             {
                 byte[] forWrite = Encoding.ASCII.GetBytes("Q1\r");
@@ -202,7 +210,7 @@ namespace UPSCls
                 r_forWrite.Data = forWrite;
                 usbDevice.WriteReport(r_forWrite);
                 //-----------------------------------
-
+                crappy_count = 0;
                 //---прием через HID---
                 usb_read_mode = true;
                 usbDevice.ReadReport(TextReport);   

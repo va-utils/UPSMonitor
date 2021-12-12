@@ -284,7 +284,7 @@
             0,
             0});
             this.nudInterval.Minimum = new decimal(new int[] {
-            250,
+            500,
             0,
             0,
             0});
@@ -292,7 +292,7 @@
             this.nudInterval.Size = new System.Drawing.Size(147, 20);
             this.nudInterval.TabIndex = 3;
             this.nudInterval.Value = new decimal(new int[] {
-            250,
+            500,
             0,
             0,
             0});
