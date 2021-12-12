@@ -100,8 +100,8 @@ namespace UPSCls
 
         private UPS()
         {
-            Trace.Listeners.Clear();
-            Trace.Listeners.Add(new TextWriterTraceListener("upscls.log"));
+          //  Trace.Listeners.Clear();
+          //  Trace.Listeners.Add(new TextWriterTraceListener("upscls.log"));
             Trace.AutoFlush = true;
             string aboutSystem = "";
             aboutSystem += "OS:" + Environment.OSVersion + "\n";
