@@ -4,7 +4,9 @@ using System.IO.Ports;
 using System.Text;
 using System.Diagnostics;
 using System.Globalization;
-
+using System.Linq;
+using System.Threading;
+using HidLibrary;
 namespace UPSCls
 {
     public struct UPSStatus
@@ -56,21 +58,43 @@ namespace UPSCls
     {
         public event EventHandler<UPSConnectEventArgs> UPSConnectStatusUpdated;
         SerialPort serialPort;
+        HidDevice usbDevice;
         public UPSStatus status;
-        
+        bool isUSB = false;
+        //---костыли для usb--
+        int cnt = 0;
+        StringBuilder sb = new StringBuilder();
+        bool usb_flag = false; //флаг разрешающий работу
+        bool usb_read_mode = false;
+        //--------------------
 
         public bool IsPortOpen
         {
             get
             {
-                if (serialPort != null)
+                if(isUSB)
                 {
-                    return serialPort.IsOpen;
+                    if (usbDevice != null)
+                    {
+                        return usbDevice.IsOpen;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
                 else
                 {
-                    return false;
+                    if (serialPort != null)
+                    {
+                        return serialPort.IsOpen;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
+
             }
         }
 
@@ -87,6 +111,7 @@ namespace UPSCls
                 aboutSystem += s + "\n";
             }
             Trace.WriteLine(aboutSystem);
+            
         }
 
         private static UPS instance = new UPS();
@@ -111,26 +136,116 @@ namespace UPSCls
 
         private void Parse(string strValues)
         {
-            strValues = strValues.Remove(0, 1);
-            String[] values = strValues.Split(' ');
-            status.InputVoltage = float.Parse(values[0], NumberStyles.Any, CultureInfo.InvariantCulture);
-            status.FaultVoltage = float.Parse(values[1], NumberStyles.Any, CultureInfo.InvariantCulture);
-            status.OutputVoltage = float.Parse(values[2], NumberStyles.Any, CultureInfo.InvariantCulture);
-            status.Loading = int.Parse(values[3], NumberStyles.Any, CultureInfo.InvariantCulture);
-            status.Frequency = float.Parse(values[4], NumberStyles.Any, CultureInfo.InvariantCulture);
-            status.BattaryVoltage = float.Parse(values[5], NumberStyles.Any, CultureInfo.InvariantCulture);
-            status.Temperature = float.Parse(values[6], NumberStyles.Any, CultureInfo.InvariantCulture);
+            try
+            { 
+                strValues = strValues.Remove(0, 1);
+                String[] values = strValues.Split(' ');
+                status.InputVoltage = float.Parse(values[0], NumberStyles.Any, CultureInfo.InvariantCulture);
+                status.FaultVoltage = float.Parse(values[1], NumberStyles.Any, CultureInfo.InvariantCulture);
+                status.OutputVoltage = float.Parse(values[2], NumberStyles.Any, CultureInfo.InvariantCulture);
+                status.Loading = int.Parse(values[3], NumberStyles.Any, CultureInfo.InvariantCulture);
+                status.Frequency = float.Parse(values[4], NumberStyles.Any, CultureInfo.InvariantCulture);
+                status.BattaryVoltage = float.Parse(values[5], NumberStyles.Any, CultureInfo.InvariantCulture);
+                status.Temperature = float.Parse(values[6], NumberStyles.Any, CultureInfo.InvariantCulture);
+            }
+            catch(FormatException fe)
+            {
+                Trace.WriteLine(CreateLogString(" из Parse() " + fe.Message));
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(CreateLogString(" из Parse() " + e.Message));
+            }
+
+        }
+
+        private void TextReport(HidReport report)
+        {
+            sb.Append(Encoding.ASCII.GetString(report.Data));
+            cnt++;
+            if (cnt == 6)
+            {
+                cnt = 0;
+                string result = sb.ToString();
+                usb_read_mode = false;
+                sb.Clear();
+                Parse(result);
+                Trace.WriteLine(CreateLogString(" << " + result));
+                status.LastUpdateDateTime = DateTime.Now;
+                OnUPSConnectStatusUpdated(true);
+            }
+            else
+            {
+                usbDevice.ReadReport(TextReport);
+            }
+        }
+
+        public void UpdateStatus_USB()
+        {
+            if(usb_flag==false) //если останавливаем работу, новых запросов не делаем.
+            {
+                return;
+            }
+            if(usb_read_mode==true) //читаем старое, не готовы к новым посылкам
+            {
+                return;
+            }
+            try
+            {
+                byte[] forWrite = Encoding.ASCII.GetBytes("Q1\r");
+                Trace.WriteLine(CreateLogString(" >> " + "Q1"));
+              
+                //int bytes = serialPort.BytesToRead;
+
+                //---посылка через HID---
+                HidReport r_forWrite = new HidReport(forWrite.Length);
+                r_forWrite.Data = forWrite;
+                usbDevice.WriteReport(r_forWrite);
+                //-----------------------------------
+
+                //---прием через HID---
+                usb_read_mode = true;
+                usbDevice.ReadReport(TextReport);   
+            }
+            catch (InvalidOperationException e)
+            {
+                Trace.WriteLine(CreateLogString(e.Message));
+                Console.WriteLine(e.Message);
+                OnUPSConnectStatusUpdated(false);
+            }
+            catch (TimeoutException e)
+            {
+                Trace.WriteLine(CreateLogString(e.Message));
+                Console.WriteLine(e.Message);
+                OnUPSConnectStatusUpdated(false);
+            }
+            catch (FormatException e)
+            {
+                Trace.WriteLine(CreateLogString(e.Message));
+                Console.WriteLine(e.Message);
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(CreateLogString(e.Message));
+                Console.WriteLine(e.Message);
+                OnUPSConnectStatusUpdated(false);
+            }
         }
 
         public void UpdateStatus()
         {
+            if(isUSB)
+            {
+                UpdateStatus_USB();
+                return;
+            }
             try
             {
                 byte[] forWrite = Encoding.ASCII.GetBytes("Q1\r");
                 Trace.WriteLine(CreateLogString(" >> " + "Q1"));
                 serialPort.Write(forWrite, 0, forWrite.Length);
                 int bytes = serialPort.BytesToRead;
-                //serialPort.
+
                 Trace.WriteLine(CreateLogString("Bytes to Read: " + bytes));
                 if (bytes > 0)
                 {
@@ -168,15 +283,62 @@ namespace UPSCls
             }
         }
 
-        public void StartExchange(string portName)
+        public void StartExchange_USB()
         {
             try
             {
+                Trace.WriteLine(CreateLogString("Port: USB"));
+                Trace.WriteLine(CreateLogString("Open port..."));
+                usbDevice.OpenDevice();
+                usb_flag = true;
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                Trace.WriteLine(CreateLogString(e.Message));
+                Console.WriteLine("USB Error: " + e.Message);
+                OnUPSConnectStatusUpdated(false);
+            }
+            catch (IOException e)
+            {
+                Trace.WriteLine(CreateLogString(e.Message));
+                Console.WriteLine("USB Error: " + e.Message);
+                OnUPSConnectStatusUpdated(false);
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(CreateLogString(e.Message));
+                Console.WriteLine("USB Error: " + e.Message);
+                OnUPSConnectStatusUpdated(false);
+            }
+        }
+
+        public void StartExchange(string portName)
+        {
+            if(portName.Contains("USB"))
+            {
+                string[] tokens = portName.Split(' ');
+                int vendorId = Convert.ToInt32(tokens[1],16);
+                int productId = Convert.ToInt32(tokens[2],16);
+                Trace.WriteLine(CreateLogString("Trying to start the exchange USB"));
+                Trace.WriteLine(CreateLogString(String.Format("USB Vendor ID {0:X} Product ID: {1:X}",vendorId,productId)));
+                usbDevice = HidDevices.Enumerate(vendorId, productId).FirstOrDefault();
+                if (usbDevice != null)
+                {
+                    isUSB = true;
+                    Trace.WriteLine(CreateLogString("Режим USB-HID"));
+                    StartExchange_USB();
+                }
+                return;
+            }
+            try
+            {
                 Trace.WriteLine(CreateLogString("Port:" + portName));
+                Trace.WriteLine(CreateLogString("Trying to start the exchange RS"));
                 serialPort = new SerialPort(portName, 2400, Parity.None, 8, StopBits.One);
                 Trace.WriteLine(CreateLogString("Open port..."));
                 serialPort.Open();
-                
+                serialPort.WriteTimeout=500;
+                serialPort.ReadTimeout=500;
               //  OnUPSConnectStatusUpdated(true);
             }
             catch (UnauthorizedAccessException e)
@@ -201,7 +363,29 @@ namespace UPSCls
 
         public void StopExchange()
         {
-            serialPort.Close();
+            try
+            {
+                if (isUSB)
+                {
+                    Trace.WriteLine(CreateLogString("Trying to stop the exchange USB"));
+                    usb_flag = false;
+                    Thread.Sleep(500);
+                    usbDevice.CloseDevice();
+                    Trace.WriteLine(CreateLogString("Closed port (USB)"));
+
+                }
+                else
+                {
+                    Trace.WriteLine(CreateLogString("Trying to stop the exchange RS"));
+                    serialPort.Close();
+                    Trace.WriteLine(CreateLogString("Closed port (COM)"));
+                }
+            }
+            catch(IOException ex)
+            {
+                Trace.WriteLine(CreateLogString(ex.Message));
+            }
+
         }
     }
 }

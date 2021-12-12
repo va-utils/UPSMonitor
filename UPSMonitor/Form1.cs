@@ -4,7 +4,9 @@ using System.Windows.Forms;
 using System.IO;
 using UPSCls;
 using System.Diagnostics;
-
+using HidLibrary;
+using System.Linq;
+using System.Collections.Generic;
 namespace UPSMonitor
 {
     public partial class MainForm : Form
@@ -12,15 +14,10 @@ namespace UPSMonitor
         bool ready;
         UPS ups;
         FileStream logStream;
-        //------------настройки мать их ети
-   ////     string comPort;
-    //    int interval;
-    //    bool log;
-        //---------------------------------
 
         public void SaveSettings()
         {
-
+         
             if (WindowState != FormWindowState.Minimized)
                 Properties.Settings.Default.Position = this.Location;
             Properties.Settings.Default.PortName = (string)cbPortName.SelectedItem;
@@ -39,16 +36,26 @@ namespace UPSMonitor
 
             nudInterval.Value = Properties.Settings.Default.Interval;
             cbLog.Checked = Properties.Settings.Default.LogOnStart;
-            string[] ports = System.IO.Ports.SerialPort.GetPortNames(); // получим список всех портов в системе
+            List<string> ports = System.IO.Ports.SerialPort.GetPortNames().ToList(); // получим список всех портов в системе
+
+            HidDevice dev; 
+            if ( (dev = HidDevices.Enumerate(0x665, 0x5161).FirstOrDefault()) != null)
+            {
+                ports.Add("USB 0x665 0x5161");
+            }
+            else if ((dev = HidDevices.Enumerate(0x6da, 0x3).FirstOrDefault()) != null)
+            {
+                ports.Add("USB 0x6DA 0x3");
+            }
+
             cbPortName.Items.Clear();
-            cbPortName.Items.AddRange(ports);
+            cbPortName.Items.AddRange(ports.ToArray());
+
             if (String.IsNullOrWhiteSpace(Properties.Settings.Default.PortName)) //если COM-порт не сохранен в настройках
             {
-                if (ports.Length > 0) //если они есть выберем первый, разрешим работу
+                if (ports.Count > 0) 
                 {
-                    cbPortName.SelectedItem = ports[0];
-                    Properties.Settings.Default.PortName = ports[0];
-                    ready = true;
+                    tabControl1.SelectedIndex = 1;
                 }
                 else // если нет ругаемся и запрещает обмен
                 {
@@ -101,6 +108,7 @@ namespace UPSMonitor
             {
                 lblErr.Visible = true;
                 notifyIcon1.Text = "UPSStatus" + "\n" + "Сбой подключения к ИБП...";
+                timer1.Stop();
             }
         }
 
@@ -169,19 +177,19 @@ namespace UPSMonitor
 
         private void saveButton_Click(object sender, EventArgs e)
         {
-
+            btSaveButton.Enabled = false;
+            Stop();
             SaveSettings();
             LoadSettings();
-
-            Stop();
             Start();
+            btSaveButton.Enabled = true;
         }
 
         private void Stop()
         {
-            if(ups.IsPortOpen)
+            timer1.Stop();
+            if (ups.IsPortOpen)
             {
-                timer1.Stop();
                 ups.StopExchange();
                 if (logStream != null)
                 {

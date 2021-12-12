@@ -50,12 +50,12 @@
             this.nudInterval = new System.Windows.Forms.NumericUpDown();
             this.cbLog = new System.Windows.Forms.CheckBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.updateLabel = new System.Windows.Forms.LinkLabel();
             this.about = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.updateLabel = new System.Windows.Forms.LinkLabel();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -227,7 +227,7 @@
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 4;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 23F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel2.Size = new System.Drawing.Size(305, 145);
@@ -270,7 +270,7 @@
             this.label3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label3.Location = new System.Drawing.Point(3, 30);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(146, 30);
+            this.label3.Size = new System.Drawing.Size(146, 23);
             this.label3.TabIndex = 2;
             this.label3.Text = "Интервал обновления (мс):";
             // 
@@ -301,7 +301,7 @@
             // 
             this.cbLog.AutoSize = true;
             this.tableLayoutPanel2.SetColumnSpan(this.cbLog, 2);
-            this.cbLog.Location = new System.Drawing.Point(3, 63);
+            this.cbLog.Location = new System.Drawing.Point(3, 56);
             this.cbLog.Name = "cbLog";
             this.cbLog.Size = new System.Drawing.Size(89, 17);
             this.cbLog.TabIndex = 4;
@@ -319,6 +319,18 @@
             this.tabPage2.TabIndex = 3;
             this.tabPage2.Text = "О программе";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // updateLabel
+            // 
+            this.updateLabel.AutoSize = true;
+            this.updateLabel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.updateLabel.Location = new System.Drawing.Point(3, 135);
+            this.updateLabel.Name = "updateLabel";
+            this.updateLabel.Size = new System.Drawing.Size(179, 13);
+            this.updateLabel.TabIndex = 1;
+            this.updateLabel.TabStop = true;
+            this.updateLabel.Text = "Проверить наличие новых версий";
+            this.updateLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.updateLabel_LinkClicked);
             // 
             // about
             // 
@@ -348,26 +360,14 @@
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.exitToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(109, 26);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(110, 26);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(108, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
             this.exitToolStripMenuItem.Text = "Выход";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
-            // 
-            // updateLabel
-            // 
-            this.updateLabel.AutoSize = true;
-            this.updateLabel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.updateLabel.Location = new System.Drawing.Point(3, 135);
-            this.updateLabel.Name = "updateLabel";
-            this.updateLabel.Size = new System.Drawing.Size(179, 13);
-            this.updateLabel.TabIndex = 1;
-            this.updateLabel.TabStop = true;
-            this.updateLabel.Text = "Проверить наличие новых версий";
-            this.updateLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.updateLabel_LinkClicked);
             // 
             // MainForm
             // 
